@@ -1085,7 +1085,12 @@
 
   // Отзывы с 2ГИС: все из reviews.js, с фильтром и кнопкой «Показать ещё»
   (function () {
-    const all = (window.REVIEWS || []).map(r => ({ s: r[0], date: r[1], name: r[2], text: r[3] }));
+    // Сначала три выбранных хороших отзыва про шиномонтаж, потом остальные по оценке: 5★ → 1★
+    const PINNED = ['Валентин Ухов|8 июля 2026', 'Сергей Сергеев|10 июня 2026', 'Егор Копытов|6 августа 2023'];
+    const rank = r => { const i = PINNED.indexOf(r.name + '|' + r.date); return i >= 0 ? i - PINNED.length : 0; };
+    const all = (window.REVIEWS || [])
+      .map((r, i) => ({ s: r[0], date: r[1], name: r[2], text: r[3], i }))
+      .sort((a, b) => rank(a) - rank(b) || b.s - a.s || a.i - b.i);
     const grid = document.getElementById('reviewsGrid');
     const more = document.getElementById('moreBtn');
     const STEP = 3;
